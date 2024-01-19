@@ -54,19 +54,29 @@ public class MyLab5Controller {
 
     double time_elapsed = 0;
     double target_time = 0;
+    
+    ////////////////////Second timer
+    double time_elapsed_2 = 0;
+    double target_time_2 = 0;
+    ////////////////////////////////
     double robot_velocity = 0.3;
     
+    /////////////////////////////////////////////////////
+    double s_y = target[1] - robot_pose.getY();
+    double s_x = target[0] - robot_pose.getX();
+    double angle = Math.atan2(s_y, s_x) - robot_pose.getTheta();//Getting the heading to target
+    
+    ///////////////////////////////////////////////////
     // define schedule
     //PioneerNav2.MoveState[] schedule = { PioneerNav2.MoveState.FOLLOW_WALL };
     ////int schedule_index = -1; // we increment before selecting the current action
     
     
     double min_distance = Math.sqrt(Math.pow((target[0] - start[0]), 2) + Math.pow(target[1] - start[1], 2)); ///Variabble to save minimum distance
-    //double[] coords_min = {start[0],start[1]};//Coordintes at minimum distance found
+    double[] coords_min = {start[0],start[1]};//Coordintes at minimum distance found
     double distance_to_travel = min_distance;//Distance variable given to the move ford state
     double[] wall_follow_start_cord = {0,0}; //Location of wall follow starting
-    int no_update = 0;
-    boolean update_min = true; 
+    
     double theta = 0;
     double cord_at_min_distance[] = {0,0};///Coordinates at the minimum distance to target
     
@@ -90,7 +100,6 @@ public class MyLab5Controller {
       System.out.println(" meters");
       if (Math.sqrt(Math.pow((target[0] - robot_pose.getX()), 2) + Math.pow(target[1] - robot_pose.getY(), 2)) < 0.05)
       { ///If close to the target then termicate the code
-           time_elapsed = target_time+1;
            nav.stop();
            state = PioneerNav2.MoveState.STOP; 
            System.out.print("Time taken :");
@@ -118,41 +127,28 @@ public class MyLab5Controller {
             time_elapsed = target_time+1; //Removing form the MoveState.FORWARD by completeing its time
             global_state = GlobalState.WALL_FOLLOW;//Changing global state to wall following
             
-            //Setting wallfollow start cords
-            wall_follow_start_cord[0] = robot_pose.getX();
-            wall_follow_start_cord[1] = robot_pose.getY();
-            
-            update_min = true; //Update the minimum distance to target
-            no_update = 0 ;//Varibale to count the times that there were no update to wall following start location
+            target_time_2 = 3200; //Setting tareget time soo that the robot clears the starting area
+            time_elapsed_2 = 0;
           }
         }
       } 
        if (global_state == GlobalState.WALL_FOLLOW)
       {
         state = PioneerNav2.MoveState.FOLLOW_WALL;//Setting navigation state to follow wall 
-         double distance = Math.sqrt(Math.pow((target[0] - robot_pose.getX()), 2) + Math.pow(target[1] - robot_pose.getY(), 2));//getting distance to target
-         no_update +=1 ; //countitng the times where the robot hasnt been in the wall followa start area
-         if ((Math.sqrt(Math.pow((wall_follow_start_cord[0] - robot_pose.getX()), 2) + Math.pow(wall_follow_start_cord[1] - robot_pose.getY(), 2)) <0.25) && (no_update >100) )
-         {
-               ///IF the no update varibale if greater than 100 and the robot is in the wall follow start area then robo has completed a round 
-               update_min = false; ///Stapping updating the minimum distance to target
-        }
-        else //else the robot is still near the start area
-        if (Math.sqrt(Math.pow((wall_follow_start_cord[0] - robot_pose.getX()), 2) + Math.pow(wall_follow_start_cord[1] - robot_pose.getY(), 2)) <0.25 )
-         {
-                no_update = 0; //making the update variabke 0 
-        }
-        
-         if ((min_distance> distance) && update_min )///updatin the distance minmumum 
-         {
-               min_distance  = distance ; 
-               cord_at_min_distance[0] = robot_pose.getX();
-               cord_at_min_distance[1] = robot_pose.getY();
-               }
-          ///if the robot is not updating the minimum  anymore and meets the minimum then change state to motion to goal     
-          if ((Math.sqrt(Math.pow((cord_at_min_distance[0] - robot_pose.getX()), 2) + Math.pow(cord_at_min_distance[1] - robot_pose.getY(), 2)) <0.3) && !update_min  )
+         if (time_elapsed_2 > target_time_2)  ///If time elapsed and found another coord where the angle is equal to the start angle then switching states
+         { 
+         
+         double  a_y = target[1] - robot_pose.getY();
+         double a_x = target[0] - robot_pose.getX();
+         double alpha  = Math.atan2(a_y, a_x) ;//Getting the current angle with the target   
+         if ( Math.abs(angle -alpha)<0.01)
          {
                global_state = GlobalState.GO_TO_GOAL;///Switching the state to go to goal since the robot is ready to start doing wall following again
+        }
+        }
+        else
+        {
+           time_elapsed_2 += timeStep;  
         }
       }
       

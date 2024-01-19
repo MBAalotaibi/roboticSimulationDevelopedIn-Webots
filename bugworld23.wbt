@@ -10,8 +10,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
-  position -0.08841436980628914 -0.554656552342331 19.81183325123508
+  orientation -0.5830377624668652 0.5830377137357141 0.5658038457800216 2.11180624843122
+  position -0.3613438617712015 1.1724639108732144 14.597597256697693
 }
 TexturedBackground {
 }
@@ -84,5 +84,5 @@ Pioneer3dx {
   ]
 }
 TrafficCone {
-  translation -5.50141 3.99054 0
+  translation -5.74141 3.87054 0
 }
